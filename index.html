@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新年祝福</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* 设置背景图片，替换为你实际的图片路径 */
+            background-image: url('A.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 垂直居中 */
+            align-items: center; /* 水平居中 */
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ff0000;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0); /* 添加透明背景 */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-size: 5em;
+            margin: 15;
+            /* 修改字体颜色为鎏金色 */
+            color: #fffb00df; 
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 4px 4px 8px rgba(0, 0, 0, 0.2), 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700; /* 增加立体感和发光效果 */
+            letter-spacing: 0.3em; /* 增大字间距 */
+        }
+
+        @keyframes flyInFromTop {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flyInFromBottom {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flyInFromLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flyInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .button {
+            background: #dc7474a8;
+            color: #e0f7fa;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .button:hover {
+            background: #b31820;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <h1 id="text"></h1>
+    </div>
+    <div class="content" style="margin-bottom: 20px;">
+        <a class="button" onclick="redirect(event)">点开</a>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const colors = ['#ff5252', '#ff4081', '#e040fb', '#7c4dff', '#536dfe', '#448aff', '#18ffff', '#64ffda', '#69f0ae', '#b2ff59'];
+
+        // 粒子类
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.z = Math.random() * 100;
+                this.color = color;
+                this.size = Math.random() * 5 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.speedZ = Math.random() * 2 - 1;
+            }
+
+            // 更新粒子位置和大小
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.z += this.speedZ;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+
+            // 绘制粒子
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        // 创建粒子
+        function createParticles() {
+            for (let i = 0; i < 100; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // 动画函数
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.size <= 0.2) {
+                    particles.splice(index, 1);
+                }
+            });
+            if (particles.length < 100) {
+                createParticles();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // 创建文字粒子效果
+        function createTextParticles(text) {
+            ctx.font = `${Math.min(canvas.width, canvas.height) / 5}px Arial`;
+            ctx.textAlign = 'center'; // 文字居中
+            ctx.textBaseline = 'middle'; // 文字垂直居中
+            const textY = canvas.height / 2; // 将文字位置设置在图片高度的中间
+            ctx.fillText(text, canvas.width / 2, textY);
+            const textData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < canvas.height; y += 10) {
+                for (let x = 0; x < canvas.width; x += 10) {
+                    const index = (y * canvas.width + x) * 4;
+                    if (textData[index + 3] > 128) {
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        particles.push(new Particle(x, y, color));
+                    }
+                }
+            }
+        }
+
+        // 重定向函数
+        function redirect(event) {
+            event.preventDefault();
+            window.location.href = 'blessings.html'; // 重定向到 blessings.html
+        }
+
+        // 显示文字并添加动画
+        function showTextWithAnimation(text) {
+            const textElement = document.getElementById('text');
+            textElement.innerHTML = '';
+            const animations = ['flyInFromTop', 'flyInFromBottom', 'flyInFromLeft', 'flyInFromRight'];
+            text.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                span.textContent = char;
+                span.style.display = 'inline-block';
+                span.style.animation = `${animations[index % animations.length]} 2s ease-out forwards`;
+                textElement.appendChild(span);
+            });
+        }
+
+        showTextWithAnimation('新年快乐');
+        createParticles();
+        animate();
+    </script>
+</body>
+
+</html>
